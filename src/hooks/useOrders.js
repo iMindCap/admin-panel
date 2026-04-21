@@ -1,33 +1,47 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase'
 
 export function useOrders() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [error, setError] = useState(null)
 
   async function fetchOrders() {
     setLoading(true)
-    const { data } = await supabase
-      .from('orders')
-      .select('*, customers(name, email)')
-      .order('created_at', { ascending: false })
-    setOrders(data || [])
+    const res = await fetch('/api/orders')
+    const json = await res.json()
+    if (!res.ok) {
+      setError(json.error)
+    } else {
+      setOrders(json.data)
+    }
     setLoading(false)
   }
 
+  async function createOrder(order) {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order),
+    })
+    const json = await res.json()
+    if (res.ok) fetchOrders()
+    return { error: res.ok ? null : json.error }
+  }
+
   async function updateStatus(id, status) {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status })
-      .eq('id', id)
-    if (!error) fetchOrders()
-    return { error }
+    const res = await fetch(`/api/orders/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    const json = await res.json()
+    if (res.ok) fetchOrders()
+    return { error: res.ok ? null : json.error }
   }
 
   useEffect(() => { fetchOrders() }, [])
 
-  return { orders, loading, updateStatus }
+  return { orders, loading, error, createOrder, updateStatus }
 }
