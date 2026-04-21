@@ -15,7 +15,8 @@ const empty = { name: '', price: '', stock: '', category: '', status: 'active' }
 
 export default function ProductForm({ open, onClose, onSubmit, initial }) {
   const [form, setForm] = useState(initial || empty)
-
+  const [error, setError] = useState(null)
+  
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
@@ -27,9 +28,12 @@ export default function ProductForm({ open, onClose, onSubmit, initial }) {
       stock: parseInt(form.stock),
     }
     const { error } = await onSubmit(payload)
-    if (!error) onClose()
+    if (error) {
+      setError(error)
+    } else {
+      onClose()
+    }
   }
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -67,6 +71,7 @@ export default function ProductForm({ open, onClose, onSubmit, initial }) {
               <option value="inactive">Inactivo</option>
             </select>
           </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex justify-end gap-2 mt-2">
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
             <Button onClick={handleSubmit}>Guardar</Button>
