@@ -1,27 +1,12 @@
 'use client'
 
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
+  AreaChart, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const data = [
-  { month: 'Ene', ingresos: 4200 },
-  { month: 'Feb', ingresos: 5800 },
-  { month: 'Mar', ingresos: 4900 },
-  { month: 'Abr', ingresos: 7200 },
-  { month: 'May', ingresos: 6100 },
-  { month: 'Jun', ingresos: 8400 },
-  { month: 'Jul', ingresos: 7900 },
-]
-
-export default function RevenueChart() {
+export default function RevenueChart({ data = [] }) {
   return (
     <Card>
       <CardHeader>
@@ -39,21 +24,12 @@ export default function RevenueChart() {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-            <XAxis
-              dataKey="month"
-              tick={{ fontSize: 12 }}
-              className="text-muted-foreground"
-            />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              className="text-muted-foreground"
-            />
-            <Tooltip
-              formatter={(value) => [`$${value}`, 'Ingresos']}
-            />
+            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
+            <Tooltip formatter={v => [`$${v}`, 'Ingresos']} />
             <Area
               type="monotone"
-              dataKey="ingresos"
+              dataKey="total"
               stroke="#6366f1"
               strokeWidth={2}
               fill="url(#colorIngresos)"
