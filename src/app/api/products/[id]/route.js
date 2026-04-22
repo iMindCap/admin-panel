@@ -1,4 +1,5 @@
 import { requireAuth } from '@/lib/auth'
+import { requireRole } from '@/lib/roles'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { validateProduct } from '@/lib/validate'
 import { ok, err } from '@/lib/response'
@@ -19,8 +20,8 @@ export async function GET(_, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const auth = await requireAuth()
-  if (auth instanceof Response) return auth
+  const result = await requireRole(['admin'])
+  if (result instanceof Response) return result
 
   const body = await request.json()
   const validationError = validateProduct(body)
@@ -45,12 +46,11 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(_, { params }) {
-  const auth = await requireAuth()
-  if (auth instanceof Response) return auth
+  const result = await requireRole(['admin'])
+  if (result instanceof Response) return result
 
   const supabase = await createServerSupabaseClient()
 
-  // Verificar que no tenga order_items asociados
   const { data: items } = await supabase
     .from('order_items')
     .select('id')

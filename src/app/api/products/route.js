@@ -1,4 +1,5 @@
 import { requireAuth } from '@/lib/auth'
+import { requireRole } from '@/lib/roles'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { validateProduct } from '@/lib/validate'
 import { ok, err } from '@/lib/response'
@@ -18,8 +19,8 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const auth = await requireAuth()
-  if (auth instanceof Response) return auth
+  const result = await requireRole(['admin'])
+  if (result instanceof Response) return result
 
   const body = await request.json()
   const validationError = validateProduct(body)

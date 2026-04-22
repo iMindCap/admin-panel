@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { useMe } from '@/hooks/useMe'
 import ProductForm from '@/components/shared/ProductForm'
 
 export default function ProductsPage() {
   const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState(null)
+  const { isAdmin } = useMe()
 
   function handleEdit(product) {
     setEditing(product)
@@ -35,9 +37,11 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-semibold">Productos</h1>
           <p className="text-muted-foreground mt-1">Gestiona tu catálogo.</p>
         </div>
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus size={16} className="mr-2" /> Nuevo producto
-        </Button>
+          {isAdmin && (
+            <Button onClick={() => setFormOpen(true)}>
+              <Plus size={16} className="mr-2" /> Nuevo producto
+            </Button>
+          )}
       </div>
 
       <Card>
@@ -68,16 +72,18 @@ export default function ProductsPage() {
                         {product.status === 'active' ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center gap-2 justify-end">
-                        <Button size="icon" variant="ghost" onClick={() => handleEdit(product)}>
-                          <Pencil size={14} />
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => deleteProduct(product.id)}>
-                          <Trash2 size={14} className="text-destructive" />
-                        </Button>
-                      </div>
-                    </td>
+                    {isAdmin && (
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <Button size="icon" variant="ghost" onClick={() => handleEdit(product)}>
+                            <Pencil size={14} />
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => deleteProduct(product.id)}>
+                            <Trash2 size={14} className="text-destructive" />
+                          </Button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
